@@ -1,4 +1,10 @@
-from setuptools import setup, find_packages
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+
+import os
+from setuptools import setup
+
+name = 'textgenrnn'
 
 long_description = '''
 Easily train your own text-generating neural network of
@@ -22,16 +28,23 @@ allowing it to learn faster and produce better results in some cases.
 - Able to generate text interactively for customized stories.
 '''
 
+modules = []
+for root, dirs, files in os.walk(name):
+    for f in files:
+        if f.endswith('.py') and '__init__' not in f:
+            module = name + root.partition(name)[-1].replace('/', '.') + '.' + f.partition('.py')[0]
+            modules.append(module)
 
 setup(
-    name='textgenrnn',
-    packages=['textgenrnn'],  # this must be the same as the name above
+    name=name,
+    packages=[name],
+    py_modules=modules,
     version='1.5.0',
     description='Easily train your own text-generating neural network ' \
     'of any size and complexity',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author='Max Woolf',
+    author='Max Woolf (modified by Colin Grambow)',
     author_email='max@minimaxir.com',
     url='https://github.com/minimaxir/textgenrnn',
     keywords=['deep learning', 'tensorflow', 'keras', 'text generation'],
@@ -39,5 +52,6 @@ setup(
     license='MIT',
     python_requires='>=3',
     include_package_data=True,
-    install_requires=['keras>=2.1.5', 'h5py', 'scikit-learn', 'tqdm']
+    install_requires=['keras>=2.1.5', 'h5py', 'scikit-learn', 'tqdm'],  # Remove to build with conda
+    scripts=[os.path.join('scripts', 'generate_quote')]
 )

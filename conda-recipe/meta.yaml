@@ -1,0 +1,31 @@
+package:
+  name: textgenrnn
+  version: 1.5.0
+
+source:
+  path: ../
+
+build:
+  number: 0
+  noarch: generic
+
+requirements:
+  build:
+    - python >=3
+    - setuptools
+
+  run:
+    - python >=3
+    - keras >=2.1.5
+    - h5py
+    - scikit-learn
+    - tqdm
+
+test:
+  imports:
+    - textgenrnn.textgenrnn
+
+about:
+  home: https://github.com/cgrambow/textgenrnn/tree/quotegen
+  license: MIT
+  summary: "A text-generating neural network"
