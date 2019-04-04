@@ -27,6 +27,6 @@ test:
     - textgenrnn.textgenrnn
 
 about:
-  home: https://github.com/cgrambow/textgenrnn/tree/old_keras
+  home: https://github.com/cgrambow/textgenrnn/tree/quotegen
   license: MIT
   summary: "A text-generating neural network"
