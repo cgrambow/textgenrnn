@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from keras.callbacks import LearningRateScheduler, Callback
 from keras.models import Model, load_model
 from keras.preprocessing import sequence
@@ -13,9 +15,9 @@ import numpy as np
 import json
 import h5py
 from pkg_resources import resource_filename
-from .model import textgenrnn_model
-from .model_training import *
-from .utils import *
+from model import textgenrnn_model
+from model_training import *
+from utils import *
 import csv
 import re
 
@@ -48,15 +50,13 @@ class textgenrnn:
                                            'textgenrnn_vocab.json')
 
         if config_path is not None:
-            with open(config_path, 'r',
-                      encoding='utf8', errors='ignore') as json_file:
+            with open(config_path, 'r') as json_file:
                 self.config = json.load(json_file)
 
         self.config.update({'name': name})
         self.default_config.update({'name': name})
 
-        with open(vocab_path, 'r',
-                  encoding='utf8', errors='ignore') as json_file:
+        with open(vocab_path, 'r') as json_file:
             self.vocab = json.load(json_file)
 
         self.tokenizer = Tokenizer(filters='', lower=False, char_level=True)
@@ -276,12 +276,10 @@ class textgenrnn:
                                       cfg=self.config)
 
         # Save the files needed to recreate the model
-        with open('{}_vocab.json'.format(self.config['name']),
-                  'w', encoding='utf8') as outfile:
+        with open('{}_vocab.json'.format(self.config['name']), 'w') as outfile:
             json.dump(self.tokenizer.word_index, outfile, ensure_ascii=False)
 
-        with open('{}_config.json'.format(self.config['name']),
-                  'w', encoding='utf8') as outfile:
+        with open('{}_config.json'.format(self.config['name']), 'w') as outfile:
             json.dump(self.config, outfile, ensure_ascii=False)
 
         self.train_on_texts(texts, new_model=True,
@@ -329,7 +327,7 @@ class textgenrnn:
             self.train_on_texts(texts, context_labels=context_labels, **kwargs)
 
     def train_from_largetext_file(self, file_path, new_model=True, **kwargs):
-        with open(file_path, 'r', encoding='utf8', errors='ignore') as f:
+        with open(file_path, 'r') as f:
             texts = [f.read()]
 
         if new_model:

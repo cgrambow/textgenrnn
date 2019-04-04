@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from keras.engine import InputSpec, Layer
 from keras import backend as K
 from keras import initializers

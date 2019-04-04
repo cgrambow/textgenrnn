@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from keras.callbacks import LearningRateScheduler, Callback
 from keras.models import Model, load_model
 from keras.preprocessing import sequence
@@ -183,7 +185,7 @@ def textgenrnn_texts_from_file(file_path, header=True,
     Retrieves texts from a newline-delimited file and returns as a list.
     '''
 
-    with open(file_path, 'r', encoding='utf8', errors='ignore') as f:
+    with open(file_path, 'r') as f:
         if header:
             f.readline()
         if is_csv:
@@ -202,7 +204,7 @@ def textgenrnn_texts_from_file_context(file_path, header=True):
     Retrieves texts+context from a two-column CSV.
     '''
 
-    with open(file_path, 'r', encoding='utf8', errors='ignore') as f:
+    with open(file_path, 'r') as f:
         if header:
             f.readline()
         texts = []
