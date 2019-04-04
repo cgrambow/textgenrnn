@@ -1,0 +1,1 @@
+{"rnn_size": 128, "verbose": 2, "name": "quotes", "word_level": false, "dim_embeddings": 100, "rnn_layers": 2, "max_length": 100, "max_words": 10000, "rnn_bidirectional": false, "single_text": false}
