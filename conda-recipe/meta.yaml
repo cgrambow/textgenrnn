@@ -1,0 +1,32 @@
+package:
+  name: textgenrnn
+  version: 0.9
+
+source:
+  path: ../
+
+build:
+  number: 0
+  noarch: generic
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+    - keras=1.2.2
+    - theano=0.9.0
+    - h5py
+    - scikit-learn
+    - tqdm
+
+test:
+  imports:
+    - textgenrnn.textgenrnn
+
+about:
+  home: https://github.com/cgrambow/textgenrnn/tree/old_keras
+  license: MIT
+  summary: "A text-generating neural network"
