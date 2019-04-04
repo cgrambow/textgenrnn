@@ -2,9 +2,8 @@
 
 from keras.optimizers import RMSprop
 from keras.layers import Input, Embedding, Dense, LSTM, Bidirectional
-from keras.layers import concatenate, Reshape, SpatialDropout1D
+from keras.layers import merge, Reshape, SpatialDropout1D
 from keras.models import Model
-from keras import backend as K
 from AttentionWeightedAverage import AttentionWeightedAverage
 
 
@@ -30,12 +29,12 @@ def textgenrnn_model(num_classes, cfg, context_size=None,
         prev_layer = embedded if i is 0 else rnn_layer_list[-1]
         rnn_layer_list.append(new_rnn(cfg, i+1)(prev_layer))
 
-    seq_concat = concatenate([embedded] + rnn_layer_list, name='rnn_concat')
+    seq_concat = merge([embedded] + rnn_layer_list, mode='concat', name='rnn_concat')
     attention = AttentionWeightedAverage(name='attention')(seq_concat)
     output = Dense(num_classes, name='output', activation='softmax')(attention)
 
     if context_size is None:
-        model = Model(inputs=[input], outputs=[output])
+        model = Model(input=[input], output=[output])
         if weights_path is not None:
             model.load_weights(weights_path, by_name=True)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer)
@@ -45,12 +44,12 @@ def textgenrnn_model(num_classes, cfg, context_size=None,
             shape=(context_size,), name='context_input')
         context_reshape = Reshape((context_size,),
                                   name='context_reshape')(context_input)
-        merged = concatenate([attention, context_reshape], name='concat')
+        merged = merge([attention, context_reshape], mode='concat', name='concat')
         main_output = Dense(num_classes, name='context_output',
                             activation='softmax')(merged)
 
-        model = Model(inputs=[input, context_input],
-                      outputs=[main_output, output])
+        model = Model(input=[input, context_input],
+                      output=[main_output, output])
         if weights_path is not None:
             model.load_weights(weights_path, by_name=True)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer,
@@ -70,25 +69,13 @@ https://github.com/keras-team/keras/issues/8860
 
 
 def new_rnn(cfg, layer_num):
-    use_cudnnlstm = K.backend() == 'tensorflow' and len(K.tensorflow_backend._get_available_gpus()) > 0
-    if use_cudnnlstm:
-        from keras.layers import CuDNNLSTM
-        if cfg['rnn_bidirectional']:
-            return Bidirectional(CuDNNLSTM(cfg['rnn_size'],
-                                           return_sequences=True),
-                                 name='rnn_{}'.format(layer_num))
+    if cfg['rnn_bidirectional']:
+        return Bidirectional(LSTM(cfg['rnn_size'],
+                                  return_sequences=True,
+                                  inner_activation='sigmoid'),
+                             name='rnn_{}'.format(layer_num))
 
-        return CuDNNLSTM(cfg['rnn_size'],
-                         return_sequences=True,
-                         name='rnn_{}'.format(layer_num))
-    else:
-        if cfg['rnn_bidirectional']:
-            return Bidirectional(LSTM(cfg['rnn_size'],
-                                      return_sequences=True,
-                                      recurrent_activation='sigmoid'),
-                                 name='rnn_{}'.format(layer_num))
-
-        return LSTM(cfg['rnn_size'],
-                    return_sequences=True,
-                    recurrent_activation='sigmoid',
-                    name='rnn_{}'.format(layer_num))
+    return LSTM(cfg['rnn_size'],
+                return_sequences=True,
+                inner_activation='sigmoid',
+                name='rnn_{}'.format(layer_num))

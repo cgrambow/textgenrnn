@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from keras.callbacks import LearningRateScheduler
 from keras.preprocessing.text import text_to_word_sequence
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.decomposition import PCA
@@ -139,13 +140,12 @@ class textgenrnn:
         indices_mask = np.random.rand(indices_list.shape[0]) < train_size
 
         gen_val = None
-        val_steps = None
+        val_samples = None
         if train_size < 1.0 and validation:
             indices_list_val = indices_list[~indices_mask, :]
             gen_val = generate_sequences_from_texts(
                 texts, indices_list_val, self, context_labels, batch_size)
-            val_steps = max(
-                int(np.floor(indices_list_val.shape[0] / batch_size)), 1)
+            val_samples = max(indices_list_val.shape[0], 1)
 
         indices_list = indices_list[indices_mask, :]
 
@@ -155,7 +155,7 @@ class textgenrnn:
         level = 'word' if self.config['word_level'] else 'character'
         print("Training on {:,} {} sequences.".format(num_tokens, level))
 
-        steps_per_epoch = max(int(np.floor(num_tokens / batch_size)), 1)
+        samples_per_epoch = max(num_tokens, 1)
 
         gen = generate_sequences_from_texts(
             texts, indices_list, self, context_labels, batch_size)
@@ -181,8 +181,8 @@ class textgenrnn:
 
         model_t = self.model
 
-        model_t.fit_generator(gen, steps_per_epoch=steps_per_epoch,
-                              epochs=num_epochs,
+        model_t.fit_generator(gen, samples_per_epoch=samples_per_epoch,
+                              nb_epoch=num_epochs,
                               callbacks=[
                                   LearningRateScheduler(
                                       lr_linear_decay),
@@ -193,15 +193,15 @@ class textgenrnn:
                                       self, num_epochs,
                                       save_epochs)],
                               verbose=verbose,
-                              max_queue_size=10,
+                              max_q_size=10,
                               validation_data=gen_val,
-                              validation_steps=val_steps
+                              nb_val_samples=val_samples
                               )
 
         # Keep the text-only version of the model if using context labels
         if context_labels is not None:
-            self.model = Model(inputs=self.model.input[0],
-                               outputs=self.model.output[1])
+            self.model = Model(input=self.model.input[0],
+                               output=self.model.output[1])
 
     def train_new_model(self, texts, context_labels=None, num_epochs=50,
                         gen_epochs=1, batch_size=128, dropout=0.0,
@@ -323,8 +323,8 @@ class textgenrnn:
         if isinstance(texts, str):
             texts = [texts]
 
-        vector_output = Model(inputs=self.model.input,
-                              outputs=self.model.get_layer('attention').output)
+        vector_output = Model(input=self.model.input,
+                              output=self.model.get_layer('attention').output)
         encoded_vectors = []
         maxlen = self.config['max_length']
         for text in texts:

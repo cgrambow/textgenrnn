@@ -2,7 +2,7 @@
 
 from keras.engine import InputSpec, Layer
 from keras import backend as K
-from keras import initializers
+from keras import initializations
 
 
 class AttentionWeightedAverage(Layer):
@@ -13,7 +13,7 @@ class AttentionWeightedAverage(Layer):
     """
 
     def __init__(self, return_attention=False, **kwargs):
-        self.init = initializers.get('uniform')
+        self.init = initializations.get('uniform')
         self.supports_masking = True
         self.return_attention = return_attention
         super(AttentionWeightedAverage, self).__init__(** kwargs)

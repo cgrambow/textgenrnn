@@ -82,7 +82,7 @@ def textgenrnn_generate(model, vocab,
         temperature = [temperature]
 
     if len(model.inputs) > 1:
-        model = Model(inputs=model.inputs[0], outputs=model.outputs[1])
+        model = Model(input=model.inputs[0], output=model.outputs[1])
 
     while not end and len(text) < max_gen_length:
         encoded_text = textgenrnn_encode_sequence(text[-maxlen:],
@@ -290,8 +290,8 @@ class save_model_weights(Callback):
 
     def on_epoch_end(self, epoch, logs={}):
         if len(self.textgenrnn.model.inputs) > 1:
-            self.textgenrnn.model = Model(inputs=self.model.input[0],
-                                          outputs=self.model.output[1])
+            self.textgenrnn.model = Model(input=self.model.input[0],
+                                          output=self.model.output[1])
         if self.save_epochs > 0 and (epoch+1) % self.save_epochs == 0 and self.num_epochs != (epoch+1):
             print("Saving Model Weights — Epoch #{}".format(epoch+1))
             self.textgenrnn.model.save_weights(
