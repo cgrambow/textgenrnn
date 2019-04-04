@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from keras.callbacks import LearningRateScheduler, Callback
-from keras.models import Model, load_model
+from keras.callbacks import Callback
+from keras.models import Model
 from keras.preprocessing import sequence
-from keras.preprocessing.text import Tokenizer, text_to_word_sequence
 from keras import backend as K
-from sklearn.preprocessing import LabelBinarizer
 from random import shuffle
 from tqdm import trange
 import numpy as np
-import json
-import h5py
 import csv
 import re
 
